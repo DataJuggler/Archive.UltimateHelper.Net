@@ -1,0 +1,23 @@
+This folder is an exact copy of the base DataJuggler.Core.UltimateHelper.
+
+The only difference is this is a strongly typed version for use in COM projects like Regionizer.
+
+Password: Butler
+
+Hint: Best Ultimate Helper I can think of is a butler. Sadly 'all' of mine quit due to lack of pay
+
+This folder directory is actually DataJuggler.Core.UltimateHelperEx which is a copy of the base
+UltimateHelper code set used for Strongly Typed projects. If any changes are required, 
+the changes should be made to the base, as eventually someone smart will join this project
+and tell me how to push the code from the base to the strongly typed version automatically 
+as a post build event or something.
+
+Are you that smart person that knows how to push code for an automatic build. 
+
+Your hired! 
+
+Open source doesn't pay very much, but there is lots of job security in it as people 
+will still expect everything to just magically work.
+
+Post a comment somewhere on this project's home and I will see it, or I will have the time
+to work on this 2021 3rd quarter, maybe.
