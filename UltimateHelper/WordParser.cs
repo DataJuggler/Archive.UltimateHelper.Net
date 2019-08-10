@@ -76,6 +76,7 @@ namespace DataJuggler.Core.UltimateHelper
             /// This method returns all of the words in a list of strings
             /// </summary>
             /// <param name="sourceText"></param>
+            /// <param name="delimeters">Create your own like this: char[] delimiterChars = { ' ','-','/', ',', '.', '\t' };</param>
             /// <returns></returns>
             public static List<Word> GetWords(string sourceText, char[] delimeters = null)
             {
