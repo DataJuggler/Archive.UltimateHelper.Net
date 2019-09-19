@@ -125,7 +125,7 @@ namespace DataJuggler.Core.UltimateHelper
                 if (month == 0)
                 {
                     // Set the value for month
-                    month = DateTime.Now.Year;
+                    month = DateTime.Now.Month;
                 }
 
                 // set the value for day
