@@ -104,7 +104,7 @@ namespace DataJuggler.Core.UltimateHelper
                     foreach(string stringWord in strings)
                     {
                         // verify the word is not an empty string or a space
-                        if ((allowEmptyStrings) && (TextHelper.Exists(stringWord)))
+                        if ((allowEmptyStrings) || (TextHelper.Exists(stringWord)))
                         {
                             // Create a new Word
                             Word word = new Word(stringWord);
