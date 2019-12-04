@@ -16,127 +16,72 @@ namespace DataJuggler.Core.UltimateHelper
     /// This object hands all encryption for this application.
     /// </summary>
     public class CryptographyHelper
-	{	
-	
+	{
+
+        #region Private variables and Constants
+        // We can use a fixed pepper for the PBKDF2 salt.
+        private static byte[] _pepper = new byte[] { 0x04, 0xC5, 0x02, 0xF8, 0xD3, 0xD4, 0x23, 0xB9 };
+        #endregion
+
 	    #region Methods
 
             #region EncryptString(string  stringToEncrypt, string password)
             /// <summary>
-			/// Encrypts a strings passed in using Electronic Code Book Cipher
+			/// Encrypts a strings passed in using CBC mode and a moderately decent KDF.  Does not provide integrity.
 			/// </summary>
 			/// <param customerName="stringToEncrypt">String to encrypt</param>
 			/// <param customerName="productPassword">productPassword needed to unlock encrypted string</param>
 			/// <returns>A new string that must have the same productPassword passed in to unlock.</returns>
             public static string EncryptString(string stringToEncrypt, string password)
 			{
-			    // Initial Value
-			    string encryptedString = null;
-
-                try
+                // We can remove the try-catch and handle null strings properly.
+                if (stringToEncrypt == null)
                 {
-                    // Verify String Does Exist
-                    if (!String.IsNullOrEmpty(stringToEncrypt))
+                    throw new ArgumentException("The string to encrypt cannot be null.", nameof(stringToEncrypt));
+                }
+
+                if (String.IsNullOrEmpty(password))
+                {
+                    throw new ArgumentException("The password to use to generate a key cannot be null or empty", nameof(password));
+                }
+
+                // Remember to dispose of types that implement IDisposable - this old code had lots of memory leaks.
+                using (var aes = AesManaged.Create())
+                using (var pbkdf2 = new Rfc2898DeriveBytes(password, _pepper, 32767)) // MD5 is insecure as KDF, we use PBKDF2 instead.
+                using (var rng = new RNGCryptoServiceProvider())
+                {
+                    var key = pbkdf2.GetBytes(32); // Let's use AES-256.
+                    var iv = new byte[16];
+                    rng.GetBytes(iv); // We always create a new, random IV for each operation.
+
+                    var plaintext = Encoding.UTF8.GetBytes(stringToEncrypt); // We use UTF8 - there is literally no reason to use ASCII in 2019.
+
+                    aes.Mode = CipherMode.CBC;
+                    aes.Padding = PaddingMode.PKCS7;
+                    aes.Key = key;
+                    aes.IV = iv;
+
+                    using (var aesTransformer = aes.CreateEncryptor())
                     {
-
-                        TripleDESCryptoServiceProvider des;
-                        MD5CryptoServiceProvider hashmd5;
-                        byte[] pwdhash;
-                        byte[] buff;
-
-                        hashmd5 = new MD5CryptoServiceProvider();
-                        pwdhash = hashmd5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(password));
-                        hashmd5 = null;
-
-                        //implement DES3 encryption
-                        des = new TripleDESCryptoServiceProvider();
-
-                        //the key is the secret productPassword hash.
-                        des.Key = pwdhash;
-
-                        // Electronic Code Book Cipher
-                        des.Mode = CipherMode.ECB; //CBC, CFB
-
-                        // Set Buffer To StringToEncrypt
-                        buff = ASCIIEncoding.ASCII.GetBytes(stringToEncrypt);
-
-                        // Get Encrypted String
-                        encryptedString = Convert.ToBase64String(des.CreateEncryptor().TransformFinalBlock(buff, 0, buff.Length));
+                        var ciphertext = aesTransformer.TransformFinalBlock(plaintext, 0, plaintext.Length);
+                        var ivAndCiphertext = new byte[iv.Length + ciphertext.Length];
+                        Array.Copy(iv, 0, ivAndCiphertext, 0, iv.Length);
+                        Array.Copy(ciphertext, 0, ivAndCiphertext, iv.Length, ciphertext.Length);
+                        return Convert.ToBase64String(ivAndCiphertext);
                     }
                 }
-                catch
-                {   
-                }
-	            	
-				// Return Encrypted String
-				return encryptedString;
-	            
 			}
 			#endregion
 
             #region EncryptString(string stringToEncrypt)
             /// <summary>
-            /// Encrypts a strings passed in using Electronic Code Book Cipher
+            /// Encrypt a string with the default password
             /// </summary>
-            /// <param customerName="stringToEncrypt">String to encrypt</param>
-            /// <returns>A new string that must have the same productPassword passed in to unlock.</returns>
+            /// <param name="stringToEncrypt"></param>
+            /// <returns></returns>
             public static string EncryptString(string stringToEncrypt)
             {
-                // Initial Value
-                string encryptedString = null;
-
-                // locals
-                TripleDESCryptoServiceProvider des;
-                MD5CryptoServiceProvider hashmd5;
-                byte[] pwdhash;
-                byte[] buff;
-                
-                // authorization code needed to decrypt productPassword.
-                string authorizationCode = "worldclass";
-                
-                try
-                {
-
-                    // Verify String Does Exist and is not null
-                    if (!String.IsNullOrEmpty(stringToEncrypt))
-                    {
-                        // encrypted system productPassword here
-                        string systemPassword = "KKxEmCUlNi6c0s7etwQclA==";
-
-                        // now decrypt productPassword 
-                        string password = CryptographyHelper.DecryptString(systemPassword, authorizationCode);
-                        
-                        // create MD5 Service 
-                        hashmd5 = new MD5CryptoServiceProvider();
-                        
-                        // compute productPassword has
-                        pwdhash = hashmd5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(password));
-                        
-                        // dispose of hashmd5
-                        hashmd5 = null;
-
-                        // implement DES3 encryption
-                        des = new TripleDESCryptoServiceProvider();
-
-                        // the key is the secret productPassword hash.
-                        des.Key = pwdhash;
-
-                        // Electronic Code Book Cipher (CBC, CFB)
-                        des.Mode = CipherMode.ECB; 
-
-                        // Set Buffer To stringToEncrypt
-                        buff = ASCIIEncoding.ASCII.GetBytes(stringToEncrypt);
-
-                        // Get Encrypted String
-                        encryptedString = Convert.ToBase64String(des.CreateEncryptor().TransformFinalBlock(buff, 0, buff.Length));
-                    }
-                }
-                catch
-                {
-                }
-
-                // Return Encrypted String
-                return encryptedString;
-
+                return EncryptString(stringToEncrypt, "worldclass");
             }
             #endregion
 
@@ -149,115 +94,62 @@ namespace DataJuggler.Core.UltimateHelper
 			/// <returns></returns>
             public static string DecryptString(string stringToDecrypt, string password)
 			{
-                // initial value
-			    string decryptedString = null;
-
-                try
+                if (stringToDecrypt == null)
                 {
-                    TripleDESCryptoServiceProvider des;
-                    MD5CryptoServiceProvider hashmd5;
-                    byte[] pwdhash;
-                    byte[] buff;
-
-                    hashmd5 = new MD5CryptoServiceProvider();
-                    pwdhash = hashmd5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(password));
-                    hashmd5 = null;
-
-                    //implement DES3 encryption
-                    des = new TripleDESCryptoServiceProvider();
-
-                    //the key is the secret productPassword hash.
-                    des.Key = pwdhash;
-
-                    // Electronic Code Book Cipher
-                    des.Mode = CipherMode.ECB; //CBC, CFB
-
-                    // Decrypt String
-                    buff = Convert.FromBase64String(stringToDecrypt);
-
-                    //decrypt DES 3 encrypted byte buffer and return ASCII string
-                    decryptedString = ASCIIEncoding.ASCII.GetString(des.CreateDecryptor().TransformFinalBlock(buff, 0, buff.Length));
+                    throw new ArgumentException("The string to decrypt cannot be null.", nameof(stringToDecrypt));
                 }
-                catch 
+
+                if (String.IsNullOrEmpty(password))
                 {
-                    
-                    
+                    throw new ArgumentException("The password to use to generate a key cannot be null or empty", nameof(password));
                 }
-					
-				// Return Value
-				return decryptedString;
-					
-			}
-			#endregion
 
-            #region DecryptString(string  stringToDecrypt)
+                var ivAndCiphertext = Convert.FromBase64String(stringToDecrypt);
+                if (ivAndCiphertext.Length < 16)
+                {
+                    throw new ArgumentException("The provided ciphertext is invalid.", nameof(stringToDecrypt));
+                }
+
+                var iv = new byte[16];
+                var ciphertext = new byte[ivAndCiphertext.Length - 16];
+                Array.Copy(ivAndCiphertext, 0, iv, 0, iv.Length);
+                Array.Copy(ivAndCiphertext, iv.Length, ciphertext, 0, ciphertext.Length);
+
+                using (var aes = AesManaged.Create())
+                using (var pbkdf2 = new Rfc2898DeriveBytes(password, _pepper, 32767))
+                {
+                    var key = pbkdf2.GetBytes(32);
+
+                    aes.Mode = CipherMode.CBC;
+                    aes.Padding = PaddingMode.PKCS7;
+                    aes.Key = key;
+                    aes.IV = iv;
+
+                    using (var aesTransformer = aes.CreateDecryptor())
+                    {
+                        var plaintext = aesTransformer.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
+                        return Encoding.UTF8.GetString(plaintext);
+                    }
+                }
+            }
+        #endregion
+
+            #region DecryptString(string stringToDecrypt)
             /// <summary>
-            /// Decrypts a string passed in.
+            /// Decrypt a string with the default password
             /// </summary>
-            /// <param customerName="stringToDecrypt">String that needs to be deciphered.</param>
+            /// <param name="stringToDecrypt"></param>
             /// <returns></returns>
             public static string DecryptString(string stringToDecrypt)
             {
-
-                // initial value
-                string decryptedString = null;
-
-                // locals
-                TripleDESCryptoServiceProvider des;
-                MD5CryptoServiceProvider hashmd5;
-                byte[] pwdhash;
-                byte[] buff;
-
-                // authorization code needed to decrypt productPassword.
-                string authorizationCode = "worldclass";
-
-                try
-                {
-                    // encrypted system productPassword here
-                    string systemPassword = "KKxEmCUlNi6c0s7etwQclA==";
-                    
-                    // now decrypt productPassword 
-                    string password = CryptographyHelper.DecryptString(systemPassword, authorizationCode);
-                
-                    // Create MD5 CryptoServiceProvider
-                    hashmd5 = new MD5CryptoServiceProvider();
-                    
-                    // computer productPassword hash
-                    pwdhash = hashmd5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(password));
-                    
-                    // dispose of object
-                    hashmd5 = null;
-
-                    //implement DES3 encryption
-                    des = new TripleDESCryptoServiceProvider();
-
-                    //the key is the secret productPassword hash.
-                    des.Key = pwdhash;
-
-                    // Electronic Code Book Cipher (CBC, CFB)
-                    des.Mode = CipherMode.ECB; 
-
-                    // Decrypt String
-                    buff = Convert.FromBase64String(stringToDecrypt);
-
-                    //decrypt DES 3 encrypted byte buffer and return ASCII string
-                    decryptedString = ASCIIEncoding.ASCII.GetString(des.CreateDecryptor().TransformFinalBlock(buff, 0, buff.Length));
-                }
-                catch
-                {
-
-
-                }
-
-                // Return Value
-                return decryptedString;
-
+                // return value
+                return DecryptString(stringToDecrypt, "worldclass");
             }
             #endregion
-			
-		#endregion
-		
-	}
+
+        #endregion
+
+    }
 	#endregion
 
 }
