@@ -109,6 +109,28 @@ namespace DataJuggler.Core.UltimateHelper.Ex
                 return hasOneOrMoreItems;
             }
             #endregion
+
+            #region HasXOrMoreItems(IList list)
+            /// <summary>
+            /// This method returns true if the List specified exists and hast at least
+            /// as many items as the value of x.
+            /// </summary>
+            public static bool HasXOrMoreItems(IList list, int x)
+            {
+                // initial value
+                bool hasXOrMoreItems = false;
+
+                // if there are one or more items
+                if ((list != null) && (list.Count >= x))
+                {
+                    // set to true
+                    hasXOrMoreItems = true;
+                }
+
+                // return value
+                return hasXOrMoreItems;
+            }
+            #endregion
             
         #endregion
 
