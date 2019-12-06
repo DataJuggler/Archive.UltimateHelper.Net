@@ -1,6 +1,6 @@
 ﻿
 
-namespace DataJuggler.Core.UltimateHelper.Enumerations
+namespace DataJuggler.Core.UltimateHelper.Ex.Enumerations
 {
 
     #region enum AssemblyTypeEnum : int

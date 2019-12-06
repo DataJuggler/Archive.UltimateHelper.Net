@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 #endregion
 
-namespace DataJuggler.Core.UltimateHelper.Objects
+namespace DataJuggler.Core.UltimateHelper.Ex.Objects
 {
 
     #region class TextLine

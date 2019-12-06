@@ -10,7 +10,7 @@ using System.IO;
 
 #endregion
 
-namespace DataJuggler.Core.UltimateHelper
+namespace DataJuggler.Core.UltimateHelper.Ex
 {
 
     #region class DateHelper
@@ -125,7 +125,7 @@ namespace DataJuggler.Core.UltimateHelper
                 if (month == 0)
                 {
                     // Set the value for month
-                    month = DateTime.Now.Year;
+                    month = DateTime.Now.Month;
                 }
 
                 // set the value for day
@@ -165,7 +165,7 @@ namespace DataJuggler.Core.UltimateHelper
                 if (month == 0)
                 {
                     // Set the value for month
-                    month = DateTime.Now.Year;
+                    month = DateTime.Now.Month;
                 }
 
                 // now create the monthStart date

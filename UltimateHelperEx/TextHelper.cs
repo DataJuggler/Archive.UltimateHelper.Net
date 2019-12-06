@@ -6,11 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DataJuggler.Core.UltimateHelper.Objects;
+using DataJuggler.Core.UltimateHelper.Ex.Objects;
 
 #endregion
 
-namespace DataJuggler.Core.UltimateHelper
+namespace DataJuggler.Core.UltimateHelper.Ex
 {
 
     #region class TextHelper

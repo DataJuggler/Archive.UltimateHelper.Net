@@ -9,7 +9,7 @@ using System.Text;
 
 #endregion
 
-namespace DataJuggler.Core.UltimateHelper
+namespace DataJuggler.Core.UltimateHelper.Ex
 {
 
     #region class BooleanHelper

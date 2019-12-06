@@ -5,14 +5,14 @@
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using DataJuggler.Core.UltimateHelper.Enumerations;
+using DataJuggler.Core.UltimateHelper.Ex.Enumerations;
 using System.IO;
-using DataJuggler.Core.UltimateHelper.Objects;
+using DataJuggler.Core.UltimateHelper.Ex.Objects;
 using System.Collections.Generic;
 
 #endregion
 
-namespace DataJuggler.Core.UltimateHelper
+namespace DataJuggler.Core.UltimateHelper.Ex
 {
 
     #region class SystemHelper

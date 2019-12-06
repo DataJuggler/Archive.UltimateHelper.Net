@@ -6,11 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using DataJuggler.Core.UltimateHelper.Objects;
+using DataJuggler.Core.UltimateHelper.Ex.Objects;
 
 #endregion
 
-namespace DataJuggler.Core.UltimateHelper
+namespace DataJuggler.Core.UltimateHelper.Ex
 {
 
     #region class WordParser
@@ -71,13 +71,15 @@ namespace DataJuggler.Core.UltimateHelper
             }
             #endregion
             
-            #region GetWords(string originalText, char[] delimeter = null)
+            #region GetWords(string originalText, char[] delimeter = null, bool allowEmptyStrings = false)
             /// <summary>
             /// This method returns all of the words in a list of strings
             /// </summary>
             /// <param name="sourceText"></param>
+            /// <param name="delimeters">Create your own like this: char[] delimiterChars = { ' ','-','/', ',', '.', '\t' };</param>
+            /// <param name="allowEmptyStrings">If true, empty strings are still returned.</param>
             /// <returns></returns>
-            public static List<Word> GetWords(string sourceText, char[] delimeters = null)
+            public static List<Word> GetWords(string sourceText, char[] delimeters = null, bool allowEmptyStrings = false)
             {
                 // initial value
                 List<Word> words = new List<Word>();
@@ -102,7 +104,7 @@ namespace DataJuggler.Core.UltimateHelper
                     foreach(string stringWord in strings)
                     {
                         // verify the word is not an empty string or a space
-                        if (!String.IsNullOrEmpty(stringWord))
+                        if ((allowEmptyStrings) || (TextHelper.Exists(stringWord)))
                         {
                             // Create a new Word
                             Word word = new Word(stringWord);

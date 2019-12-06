@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 #endregion
 
-namespace DataJuggler.Core.UltimateHelper
+namespace DataJuggler.Core.UltimateHelper.Ex
 {
 
     #region class PromptHelper

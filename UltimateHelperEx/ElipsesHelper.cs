@@ -8,12 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataJuggler.Core.UltimateHelper.Enumerations;
+using DataJuggler.Core.UltimateHelper.Ex.Enumerations;
 using System.IO;
 
 #endregion
 
-namespace DataJuggler.Core.UltimateHelper
+namespace DataJuggler.Core.UltimateHelper.Ex
 {
 
     #region class ElipsesHelper

@@ -11,7 +11,7 @@ using System.Web.UI.WebControls;
 
 #endregion
 
-namespace DataJuggler.Core.UltimateHelper
+namespace DataJuggler.Core.UltimateHelper.Ex
 {
 
     #region class ParentObjectHelper

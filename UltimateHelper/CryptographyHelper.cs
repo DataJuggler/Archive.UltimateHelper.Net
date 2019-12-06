@@ -1,10 +1,13 @@
-
+﻿
 
 #region using statements
 
 using System;
 using System.Text;
 using System.Security.Cryptography;
+using Konscious.Security.Cryptography;
+using System.Linq;
+using DataJuggler.Core.UltimateHelper.Objects;
 
 #endregion
 
@@ -16,127 +19,35 @@ namespace DataJuggler.Core.UltimateHelper
     /// This object hands all encryption for this application.
     /// </summary>
     public class CryptographyHelper
-	{	
+	{
+
+        #region Private Variables
+        // We can use a fixed pepper for the PBKDF2 salt.
+        private static byte[] _pepper = new byte[] { 0x04, 0xC5, 0x02, 0xF8, 0xD3, 0xD4, 0x23, 0xB9 };
+        public const string DefaultPassword = "NotASecret";
+        #endregion
 	
 	    #region Methods
 
-            #region EncryptString(string  stringToEncrypt, string password)
+            #region CreateSalt()
             /// <summary>
-			/// Encrypts a strings passed in using Electronic Code Book Cipher
-			/// </summary>
-			/// <param customerName="stringToEncrypt">String to encrypt</param>
-			/// <param customerName="productPassword">productPassword needed to unlock encrypted string</param>
-			/// <returns>A new string that must have the same productPassword passed in to unlock.</returns>
-            public static string EncryptString(string stringToEncrypt, string password)
-			{
-			    // Initial Value
-			    string encryptedString = null;
-
-                try
-                {
-                    // Verify String Does Exist
-                    if (!String.IsNullOrEmpty(stringToEncrypt))
-                    {
-
-                        TripleDESCryptoServiceProvider des;
-                        MD5CryptoServiceProvider hashmd5;
-                        byte[] pwdhash;
-                        byte[] buff;
-
-                        hashmd5 = new MD5CryptoServiceProvider();
-                        pwdhash = hashmd5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(password));
-                        hashmd5 = null;
-
-                        //implement DES3 encryption
-                        des = new TripleDESCryptoServiceProvider();
-
-                        //the key is the secret productPassword hash.
-                        des.Key = pwdhash;
-
-                        // Electronic Code Book Cipher
-                        des.Mode = CipherMode.ECB; //CBC, CFB
-
-                        // Set Buffer To StringToEncrypt
-                        buff = ASCIIEncoding.ASCII.GetBytes(stringToEncrypt);
-
-                        // Get Encrypted String
-                        encryptedString = Convert.ToBase64String(des.CreateEncryptor().TransformFinalBlock(buff, 0, buff.Length));
-                    }
-                }
-                catch
-                {   
-                }
-	            	
-				// Return Encrypted String
-				return encryptedString;
-	            
-			}
-			#endregion
-
-            #region EncryptString(string stringToEncrypt)
-            /// <summary>
-            /// Encrypts a strings passed in using Electronic Code Book Cipher
+            /// This method creates a byte array to use
             /// </summary>
-            /// <param customerName="stringToEncrypt">String to encrypt</param>
-            /// <returns>A new string that must have the same productPassword passed in to unlock.</returns>
-            public static string EncryptString(string stringToEncrypt)
+            /// <returns></returns>
+            private static byte[] CreateSalt()
             {
-                // Initial Value
-                string encryptedString = null;
+                // initial value
+                byte[] buffer = null;
 
-                // locals
-                TripleDESCryptoServiceProvider des;
-                MD5CryptoServiceProvider hashmd5;
-                byte[] pwdhash;
-                byte[] buff;
-                
-                // authorization code needed to decrypt productPassword.
-                string authorizationCode = "worldclass";
-                
-                try
+                // Create a strong random number generator
+                using (var rng = new RNGCryptoServiceProvider())
                 {
-
-                    // Verify String Does Exist and is not null
-                    if (!String.IsNullOrEmpty(stringToEncrypt))
-                    {
-                        // encrypted system productPassword here
-                        string systemPassword = "KKxEmCUlNi6c0s7etwQclA==";
-
-                        // now decrypt productPassword 
-                        string password = CryptographyHelper.DecryptString(systemPassword, authorizationCode);
-                        
-                        // create MD5 Service 
-                        hashmd5 = new MD5CryptoServiceProvider();
-                        
-                        // compute productPassword has
-                        pwdhash = hashmd5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(password));
-                        
-                        // dispose of hashmd5
-                        hashmd5 = null;
-
-                        // implement DES3 encryption
-                        des = new TripleDESCryptoServiceProvider();
-
-                        // the key is the secret productPassword hash.
-                        des.Key = pwdhash;
-
-                        // Electronic Code Book Cipher (CBC, CFB)
-                        des.Mode = CipherMode.ECB; 
-
-                        // Set Buffer To stringToEncrypt
-                        buff = ASCIIEncoding.ASCII.GetBytes(stringToEncrypt);
-
-                        // Get Encrypted String
-                        encryptedString = Convert.ToBase64String(des.CreateEncryptor().TransformFinalBlock(buff, 0, buff.Length));
-                    }
+                    buffer = new byte[16];
+                    rng.GetBytes(buffer);
                 }
-                catch
-                {
-                }
-
-                // Return Encrypted String
-                return encryptedString;
-
+                
+                // return value
+                return buffer;
             }
             #endregion
 
@@ -150,114 +61,316 @@ namespace DataJuggler.Core.UltimateHelper
             public static string DecryptString(string stringToDecrypt, string password)
 			{
                 // initial value
-			    string decryptedString = null;
+                string decryptedValue = "";
 
-                try
+                // if both strings exist
+                if (TextHelper.Exists(stringToDecrypt, password))
                 {
-                    TripleDESCryptoServiceProvider des;
-                    MD5CryptoServiceProvider hashmd5;
-                    byte[] pwdhash;
-                    byte[] buff;
+                    var ivAndCiphertext = Convert.FromBase64String(stringToDecrypt);
+                    if (ivAndCiphertext.Length >= 16)
+                    {
+                        var iv = new byte[16];
+                        var ciphertext = new byte[ivAndCiphertext.Length - 16];
+                        Array.Copy(ivAndCiphertext, 0, iv, 0, iv.Length);
+                        Array.Copy(ivAndCiphertext, iv.Length, ciphertext, 0, ciphertext.Length);
 
-                    hashmd5 = new MD5CryptoServiceProvider();
-                    pwdhash = hashmd5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(password));
-                    hashmd5 = null;
+                        using (var aes = AesManaged.Create())
+                        using (var pbkdf2 = new Rfc2898DeriveBytes(password, _pepper, 32767))
+                        {
+                            var key = pbkdf2.GetBytes(32);
 
-                    //implement DES3 encryption
-                    des = new TripleDESCryptoServiceProvider();
+                            aes.Mode = CipherMode.CBC;
+                            aes.Padding = PaddingMode.PKCS7;
+                            aes.Key = key;
+                            aes.IV = iv;
 
-                    //the key is the secret productPassword hash.
-                    des.Key = pwdhash;
+                            // create a new Decryptor                            
+                            using (var aesTransformer = aes.CreateDecryptor())
+                            {
+                                // get a byte array of the plain text
+                                var plaintext = aesTransformer.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
 
-                    // Electronic Code Book Cipher
-                    des.Mode = CipherMode.ECB; //CBC, CFB
-
-                    // Decrypt String
-                    buff = Convert.FromBase64String(stringToDecrypt);
-
-                    //decrypt DES 3 encrypted byte buffer and return ASCII string
-                    decryptedString = ASCIIEncoding.ASCII.GetString(des.CreateDecryptor().TransformFinalBlock(buff, 0, buff.Length));
+                                // set the return value
+                                decryptedValue = Encoding.UTF8.GetString(plaintext);
+                            }
+                        }
+                    }
                 }
-                catch 
-                {
-                    
-                    
-                }
-					
-				// Return Value
-				return decryptedString;
-					
-			}
-			#endregion
 
-            #region DecryptString(string  stringToDecrypt)
+                // return value
+                return decryptedValue;
+            }
+            #endregion
+
+            #region DecryptString(string stringToDecrypt)
             /// <summary>
-            /// Decrypts a string passed in.
+            /// This method decrypts a string using the default password.
             /// </summary>
-            /// <param customerName="stringToDecrypt">String that needs to be deciphered.</param>
+            /// <param name="stringToDecrypt"></param>
             /// <returns></returns>
             public static string DecryptString(string stringToDecrypt)
             {
-
-                // initial value
-                string decryptedString = null;
-
-                // locals
-                TripleDESCryptoServiceProvider des;
-                MD5CryptoServiceProvider hashmd5;
-                byte[] pwdhash;
-                byte[] buff;
-
-                // authorization code needed to decrypt productPassword.
-                string authorizationCode = "worldclass";
-
-                try
-                {
-                    // encrypted system productPassword here
-                    string systemPassword = "KKxEmCUlNi6c0s7etwQclA==";
-                    
-                    // now decrypt productPassword 
-                    string password = CryptographyHelper.DecryptString(systemPassword, authorizationCode);
-                
-                    // Create MD5 CryptoServiceProvider
-                    hashmd5 = new MD5CryptoServiceProvider();
-                    
-                    // computer productPassword hash
-                    pwdhash = hashmd5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(password));
-                    
-                    // dispose of object
-                    hashmd5 = null;
-
-                    //implement DES3 encryption
-                    des = new TripleDESCryptoServiceProvider();
-
-                    //the key is the secret productPassword hash.
-                    des.Key = pwdhash;
-
-                    // Electronic Code Book Cipher (CBC, CFB)
-                    des.Mode = CipherMode.ECB; 
-
-                    // Decrypt String
-                    buff = Convert.FromBase64String(stringToDecrypt);
-
-                    //decrypt DES 3 encrypted byte buffer and return ASCII string
-                    decryptedString = ASCIIEncoding.ASCII.GetString(des.CreateDecryptor().TransformFinalBlock(buff, 0, buff.Length));
-                }
-                catch
-                {
-
-
-                }
-
-                // Return Value
-                return decryptedString;
-
+                // return value
+                return DecryptString(stringToDecrypt, DefaultPassword);
             }
             #endregion
-			
-		#endregion
-		
-	}
+
+            #region EncryptString(string  stringToEncrypt, string password)
+            /// <summary>
+			/// Encrypts a strings passed in using CBC mode and a moderately decent KDF.  Does not provide integrity.
+            /// This method will return a different value every time called, yet will still decrypt correctly.
+			/// </summary>
+			/// <param customerName="stringToEncrypt">String to encrypt</param>
+			/// <param customerName="productPassword">productPassword needed to unlock encrypted string</param>
+			/// <returns>A new string that must have the same productPassword passed in to unlock.</returns>
+            public static string EncryptString(string stringToEncrypt, string password)
+			{
+                // initial value
+                string encryptedString = "";
+
+                // if both strings exist
+                if (TextHelper.Exists(stringToEncrypt, password))
+                {
+                    // Remember to dispose of types that implement IDisposable - this old code had lots of memory leaks.
+                    using (var aes = AesManaged.Create())
+                    using (var pbkdf2 = new Rfc2898DeriveBytes(password, _pepper, 32767)) // MD5 is insecure as KDF, we use PBKDF2 instead.
+                    using (var rng = new RNGCryptoServiceProvider())
+                    {
+                        var key = pbkdf2.GetBytes(32); // Let's use AES-256.
+                        var iv = new byte[16];
+                        rng.GetBytes(iv); // We always create a new, random IV for each operation.
+
+                        var plaintext = Encoding.UTF8.GetBytes(stringToEncrypt); // We use UTF8
+
+                        aes.Mode = CipherMode.CBC;
+                        aes.Padding = PaddingMode.PKCS7;
+                        aes.Key = key;
+                        aes.IV = iv;
+
+                        using (var aesTransformer = aes.CreateEncryptor())
+                        {
+                            var ciphertext = aesTransformer.TransformFinalBlock(plaintext, 0, plaintext.Length);
+                            var ivAndCiphertext = new byte[iv.Length + ciphertext.Length];
+                            Array.Copy(iv, 0, ivAndCiphertext, 0, iv.Length);
+                            Array.Copy(ciphertext, 0, ivAndCiphertext, iv.Length, ciphertext.Length);
+                            encryptedString = Convert.ToBase64String(ivAndCiphertext);
+                        }
+                    }
+                }
+
+                // return value
+                return encryptedString;
+			}
+			#endregion
+
+            #region EncryptString(string stringToEncrypt)
+            /// <summary>
+            /// Override that uses default password
+            /// </summary>
+            /// <param name="stringToEncrypt"></param>
+            /// <returns></returns>
+            public static string EncryptString(string stringToEncrypt)
+            {
+                return EncryptString(stringToEncrypt, DefaultPassword);
+            }
+            #endregion
+
+            #region GeneratePasswordHash(string password)
+            /// <summary>
+            /// This method hashes the password using Konscious.Security.Cryptography's implementation of Argon2.
+            /// The salt is returned with the password separated by 4 | (pipe characters I think is the name).
+            /// You can decrypt from the encrypted password hash to determine the passwordhash and salt, but you cannot decrypt from 
+            /// password hash back to the password.
+            /// This method uses the default password, which is NotASecret.
+            /// </summary>
+            /// <param name="password">The password to create a hash for</param>
+            /// </param>
+            /// <returns></returns>
+            public static string GeneratePasswordHash(string password)
+            {
+                // return value
+                return GeneratePasswordHash(password, DefaultPassword);
+            }
+            #endregion
+
+            #region GeneratePasswordHash(string password, string keyCode)
+            /// <summary>
+            /// This method hashes the password using Konscious.Security.Cryptography's implementation of Argon2.
+            /// The salt is returned with the password separated by 4 | (pipe characters I think is the name).
+            /// You can decrypt from the encrypted password hash to determine the passwordhash and salt, but you cannot decrypt from 
+            /// password hash back to the password.
+            /// </summary>
+            /// <param name="password">The password to create a hash for</param>
+            /// <param name="keyCode">A keycode string you create that is used to encrypt/decrypt the password hash 
+            /// after it is created. You can decrypt from the encrypted password hash to determine the passwordhash and salt, but you cannot decrypt from 
+            /// password hash back to the password.
+            /// </param>
+            /// <returns></returns>
+            public static string GeneratePasswordHash(string password, string keyCode)
+            {
+                // get the passwordHash
+                string passwordHash = null;
+
+                // the salt is either created or used
+                byte[] salt;
+                
+                // if the password exists
+                if (TextHelper.Exists(password, keyCode))
+                {  
+                    // create the salt
+                    salt = CreateSalt();
+
+                    // get the byte array
+                    byte[] passwordBits = HashPassword(password, salt);
+
+                    // create the hashInfo
+                    PasswordHashInfo hashInfo = new PasswordHashInfo(passwordBits, salt);
+
+                    // get the hashInfo
+                    string partI = hashInfo.ToString();
+
+                    // set the return value
+                    passwordHash = EncryptString(partI, keyCode);
+                }
+
+                // return value
+                return passwordHash;
+            }
+            #endregion
+
+            #region HashPassword(string password, byte[] salt)
+            /// <summary>
+            /// Hash this password
+            /// </summary>
+            /// <param name="password"></param>
+            /// <param name="keyCode"></param>
+            /// <param name="salt"></param>
+            /// <returns></returns>
+            private static byte[] HashPassword(string password, byte[] salt)
+            {
+                // initial value
+                byte[] hash = null;
+                    
+                // if all 3 strings exist
+                if (TextHelper.Exists(password))
+                {
+                    // Create a new instance of an 'Argon2id' object.
+                    var argon2 = new Argon2id(Encoding.Unicode.GetBytes(password));
+
+                    argon2.Salt = salt;
+                    argon2.DegreeOfParallelism = 8; // four cores
+                    argon2.Iterations = 4;
+                    argon2.MemorySize = 1024 * 1024; // 1 GB
+
+                    // get the hash
+                    hash = argon2.GetBytes(16);
+                }
+
+                // return value
+                return hash;
+            }
+            #endregion
+
+            #region VerifyHash(string userTypedPassword, string storedPasswordHash)
+            /// <summary>
+            /// This method is used to verify the Hash created is the same as a hash stored in the database.
+            /// This method uses the default password, which is NotASecret. If you stored the password with a keycode
+            /// you must use that keycode to decrypt and if you used the default value to encrypt you must use the default
+            /// password to decrypt.
+            /// </summary>
+            /// <param name="userTypedPassword">The password typed in by a user for a login attempt.</param>
+            /// <param name="storedPasswordHash">The password hash that is stored with the salt.</param>
+            /// <returns></returns>
+            public static bool VerifyHash(string userTypedPassword, string storedPasswordHash)
+            {
+                return VerifyHash(userTypedPassword, DefaultPassword, storedPasswordHash);
+            }
+            #endregion
+
+            #region VerifyHash(string userTypedPassword, string keyCode, string storedPasswordHash)
+            /// <summary>
+            /// This method is used to verify the Hash created is the same as a hash stored in the database.
+            /// </summary>
+            /// <param name="password"></param>
+            /// <param name="keyCode"></param>
+            /// <param name="salt"></param>
+            /// <returns></returns>
+            public static bool VerifyHash(string userTypedPassword, string keyCode, string storedPasswordHash)
+            {
+                // initial value
+                bool verified = false;
+
+                // locals
+                // get the password up until the separator
+                string password = "";
+                string salty = "";
+                byte[] salt = null;
+                byte[] storedHash = null;
+
+                // if all the parameters exist
+                if (TextHelper.Exists(userTypedPassword, keyCode, storedPasswordHash))
+                {
+                    // we must first decrypt the storedPasswordHash with the keycode
+                    string decryptedHash = DecryptString(storedPasswordHash, keyCode);
+
+                    // if the decryptedHash exists
+                    if (TextHelper.Exists(decryptedHash))
+                    {
+                        // create a byteArray
+                        int index = decryptedHash.IndexOf("||||");
+
+                        // if the index was found
+                        if (index >= 0)
+                        {
+                            // get the password
+                            password = decryptedHash.Substring(0, index);
+                            salty = decryptedHash.Substring(index + 4);
+                            salt = Encoding.Unicode.GetBytes(salty);
+                            storedHash = Encoding.Unicode.GetBytes(password);
+                        }
+
+                        // now verify with the override
+                        verified = VerifyHash(userTypedPassword, salt, storedHash);
+                    }
+                }
+
+                // return value
+                return verified;
+            }
+            #endregion
+
+            #region VerifyHash(string password, byte[] salt, byte[] storedHash)
+            /// <summary>
+            /// This method is used to verify the Hash created is the same as the 
+            /// </summary>
+            /// <param name="password"></param>
+            /// <param name="keyCode"></param>
+            /// <param name="salt"></param>
+            /// <param name="newHash"></param>
+            /// <returns></returns>
+            public static bool VerifyHash(string password, byte[] salt, byte[] storedHash)
+            {
+                // initial value
+                bool verified = false;
+
+                // if all the parameters exist
+                if (TextHelper.Exists(password) && (salt.Length > 0) && (storedHash.Length > 0))
+                {
+                    // generate the loginHash again
+                    var newHash = HashPassword(password,  salt);
+
+                    // set the return value
+                    verified = storedHash.SequenceEqual(newHash);
+                }
+
+                // return value
+                return verified;
+            }
+            #endregion
+
+        #endregion
+
+    }
 	#endregion
 
 }

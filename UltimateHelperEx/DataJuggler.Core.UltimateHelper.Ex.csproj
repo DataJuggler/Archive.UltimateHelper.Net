@@ -7,8 +7,8 @@
     <ProjectGuid>{B570D96E-C163-480D-8C89-192AC7CEF60A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DataJuggler.Core.UltimateHelper</RootNamespace>
-    <AssemblyName>DataJuggler.Core.UltimateHelper</AssemblyName>
+    <RootNamespace>DataJuggler.Core.UltimateHelper.Ex</RootNamespace>
+    <AssemblyName>DataJuggler.Core.UltimateHelper.Ex</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -44,10 +44,20 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Konscious.Security.Cryptography.Argon2, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Konscious.Security.Cryptography.Argon2.1.2.1\lib\net46\Konscious.Security.Cryptography.Argon2.dll</HintPath>
+    </Reference>
+    <Reference Include="Konscious.Security.Cryptography.Blake2, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Konscious.Security.Cryptography.Blake2.1.0.9\lib\net46\Konscious.Security.Cryptography.Blake2.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -72,6 +82,7 @@
     <Compile Include="MouseHelper.cs" />
     <Compile Include="NullHelper.cs" />
     <Compile Include="NumericHelper.cs" />
+    <Compile Include="Objects\PasswordHashInfo.cs" />
     <Compile Include="Objects\TextLine.cs" />
     <Compile Include="Objects\Word.cs" />
     <Compile Include="ParentControlHelper.cs" />
@@ -88,6 +99,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="RAD Studio Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

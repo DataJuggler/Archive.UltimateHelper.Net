@@ -1,23 +1,25 @@
 
-
 #region using statements
 
 using System;
 using System.Windows.Forms;
 using DataJuggler.Core.UltimateHelper;
+using DataJuggler.Core.UltimateHelper.Objects;
 
 #endregion
-
 
 namespace Crypto
 {
 
-    #region class MainForm : Form
+    #region class MainForm
     /// <summary>
     /// This is the main form for this application.
     /// </summary>
     public partial class MainForm : Form
     {
+        
+        #region Private Variables
+        #endregion
         
         #region Constructor
         /// <summary>
@@ -32,74 +34,9 @@ namespace Crypto
             Init();
         }
         #endregion
-
+        
         #region Events
-
-            #region EncryptClearButton_Click(object sender, EventArgs e)
-            /// <summary>
-            /// Clears The Encryption Panel Controls.
-            /// </summary>
-            /// <param name="sender"></param>
-            /// <param name="e"></param>
-            private void EncryptClearButton_Click(object sender, EventArgs e)
-            {
-                // Clear Encryption Controls
-                ClearStringEncryptionControls();
-            }
-            #endregion
-
-            #region EncryptCopyButton_Click(object sender, EventArgs e)
-            /// <summary>
-            /// Copies the text of the encryption result to the clipboard.
-            /// </summary>
-            /// <param name="sender"></param>
-            /// <param name="e"></param>
-            private void EncryptCopyButton_Click(object sender, EventArgs e)
-            {
-                // Copy encryption result to clipboard.
-                EncryptionCopy();
-            }
-            #endregion
-
-            #region EncryptButton_Click(object sender, EventArgs e)
-            /// <summary>
-            /// Performs the encryption of the entered text.
-            /// </summary>
-            /// <param name="sender"></param>
-            /// <param name="e"></param>
-            private void EncryptButton_Click(object sender, EventArgs e)
-            {
-               // Perform Encryption
-               EncryptString();
-            }
-            #endregion
-
-            #region DecryptClearButton_Click(object sender, EventArgs e)
-            /// <summary>
-            /// Clears the decryption panel controls.
-            /// </summary>
-            /// <param name="sender"></param>
-            /// <param name="e"></param>
-            private void DecryptClearButton_Click(object sender, EventArgs e)
-            {
-                // Clear controls in the decryption panel.
-                ClearStringDecryptionControls();
-            }
-            #endregion
-
-            #region DecryptCopyButton_Click(object sender, EventArgs e)
-            /// <summary>
-            /// Copies the text of the descryption result to the clipboard.
-            /// </summary>
-            /// <param name="sender"></param>
-            /// <param name="e"></param>
-            private void DecryptCopyButton_Click(object sender, EventArgs e)
-            {
-                // Copy the result of decryption to the clipboard.
-                DecryptionCopy();
-            }
-            #endregion
-
+            
             #region DecryptButton_Click(object sender, EventArgs e)
             /// <summary>
             /// Performs the decryption of the entered text.
@@ -112,7 +49,92 @@ namespace Crypto
                 DecryptString();
             } 
             #endregion
-
+            
+            #region DecryptClearButton_Click(object sender, EventArgs e)
+            /// <summary>
+            /// Clears the decryption panel controls.
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="e"></param>
+            private void DecryptClearButton_Click(object sender, EventArgs e)
+            {
+                // Clear controls in the decryption panel.
+                ClearStringDecryptionControls();
+            }
+            #endregion
+            
+            #region DecryptCopyButton_Click(object sender, EventArgs e)
+            /// <summary>
+            /// Copies the text of the descryption result to the clipboard.
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="e"></param>
+            private void DecryptCopyButton_Click(object sender, EventArgs e)
+            {
+                // Copy the result of decryption to the clipboard.
+                DecryptionCopy();
+            }
+            #endregion
+            
+            #region EncryptButton_Click(object sender, EventArgs e)
+            /// <summary>
+            /// Performs the encryption of the entered text.
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="e"></param>
+            private void EncryptButton_Click(object sender, EventArgs e)
+            {
+                // Perform Encryption
+                EncryptString();
+            }
+            #endregion
+            
+            #region EncryptClearButton_Click(object sender, EventArgs e)
+            /// <summary>
+            /// Clears The Encryption Panel Controls.
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="e"></param>
+            private void EncryptClearButton_Click(object sender, EventArgs e)
+            {
+                // Clear Encryption Controls
+                ClearStringEncryptionControls();
+            }
+            #endregion
+            
+            #region EncryptCopyButton_Click(object sender, EventArgs e)
+            /// <summary>
+            /// Copies the text of the encryption result to the clipboard.
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="e"></param>
+            private void EncryptCopyButton_Click(object sender, EventArgs e)
+            {
+                // Copy encryption result to clipboard.
+                EncryptionCopy();
+            }
+            #endregion
+            
+            #region GeneratePasswordHashButton_Click(object sender, EventArgs e)
+            /// <summary>
+            /// event is fired when the 'GeneratePasswordHashButton' is clicked.
+            /// </summary>
+            private void GeneratePasswordHashButton_Click(object sender, EventArgs e)
+            {
+                // Get the password
+                string password = PasswordControl.Text;
+                
+                // set the keyCode
+                string keyCode = KeyCodeControl.Text;
+                
+                // Get an encryptedHash
+                string encryptedHashWithSalt = CryptographyHelper.GeneratePasswordHash(password, keyCode);
+                
+                // Display the result
+                PasswordHashWithSaltTextBox.Text = encryptedHashWithSalt;
+            }
+            #endregion
+            
             #region MainForm_Activated(object sender, EventArgs e)
             /// <summary>
             /// This event is fired when Main Form _ Activated
@@ -132,19 +154,19 @@ namespace Crypto
             {
                 // get the height of this form
                 int height = this.Height;
-
+                
                 // get the titleBar height
                 int TitlebarHeight = this.Height - this.ClientSize.Height - 2;
-
+                
                 // get the height of each content area
                 int contentAreaHeight = (this.Height - TitlebarHeight - this.TopMarginPanel.Height - this.BottomMarginPanel.Height - this.DividerPanel.Height) / 2;
-
+                
                 // setting this height resizes the form
                 this.EncryptionPanel.Height = contentAreaHeight;
-
+                
                 // set the height of the StringToDecryptControl (the EncryptedStringControl is Dock.Fill)
                 this.StringToEncryptControl.Height = (this.EncryptionPanel.Height - this.EncryptionControlPanel.Height - this.EncryptionPasswordControl.Height) / 2;
-
+                
                 // now set the height of the StringTo
                 this.StringToDecryptControl.Height = StringToEncryptControl.Height;
             }
@@ -162,7 +184,7 @@ namespace Crypto
                 UIEnable();
             } 
             #endregion
-
+            
             #region StringDecryptionResultTextBox_TextChanged(object sender, EventArgs e)
             /// <summary>
             /// Calls UIEnable to enable controls on this form when this text changes.
@@ -175,7 +197,7 @@ namespace Crypto
                 UIEnable();
             } 
             #endregion
-
+            
             #region StringEncryptionPasswordTextBox_TextChanged(object sender, EventArgs e)
             /// <summary>
             /// Calls UIEnable to enable controls on this form when this text changes.
@@ -188,7 +210,7 @@ namespace Crypto
                 UIEnable();
             } 
             #endregion
-
+            
             #region StringEncryptionResultTextBox_TextChanged(object sender, EventArgs e)
             /// <summary>
             /// Calls UIEnable to enable controls on this form when this text changes.
@@ -201,7 +223,7 @@ namespace Crypto
                 UIEnable();
             }
             #endregion
-
+            
             #region StringToDecryptTextBox_TextChanged(object sender, EventArgs e)
             /// <summary>
             /// Calls UIEnable to enable controls on this form when this text changes.
@@ -214,7 +236,7 @@ namespace Crypto
                 UIEnable();
             } 
             #endregion
-
+            
             #region StringToEncryptTextBox_TextChanged(object sender, EventArgs e)
             /// <summary>
             /// Calls UIEnable to enable controls on this form when this text changes.
@@ -228,10 +250,34 @@ namespace Crypto
             } 
             #endregion
             
+            #region VerifyButton_Click(object sender, EventArgs e)
+            /// <summary>
+            /// event is fired when the 'VerifyButton' is clicked.
+            /// </summary>
+            private void VerifyButton_Click(object sender, EventArgs e)
+            {
+                string userTypedPassword = PasswordControl.Text;
+                string keyCode = KeyCodeControl.Text;
+                string storedPassword = PasswordHashWithSaltTextBox.Text;
+
+                // bool is verified
+                bool verified = CryptographyHelper.VerifyHash(userTypedPassword, keyCode, storedPassword); 
+
+                if (verified)
+                {
+                    MessageBoxHelper.ShowMessage("Passwords Verified", "Verified");
+                }
+                else
+                {
+                    MessageBoxHelper.ShowMessage("Password Could Not Be Verified", "Imposter");
+                }
+            }
+            #endregion
+            
         #endregion
         
         #region Methods
-
+            
             #region ClearStringDecryptionControls()
             /// <summary>
             /// Clears the controls in the decryption panel.
@@ -244,7 +290,7 @@ namespace Crypto
                 this.DecryptedStringControl.Text = "";
             }  
             #endregion
-
+            
             #region ClearStringEncryptionControls()
             /// <summary>
             /// Clears the text box controls in the encryption panel.
@@ -257,7 +303,7 @@ namespace Crypto
                 this.EncryptedStringControl.Text = "";
             }  
             #endregion
-
+            
             #region DecryptionCopy()
             /// <summary>
             /// Copies the text of the decryption result to the clipboard.
@@ -266,12 +312,12 @@ namespace Crypto
             {
                 // Get decryption result from text box
                 string decryptionResult = this.DecryptedStringControl.Text;
-
+                
                 // Copy decryption result to the clipboard.
                 Clipboard.SetText(decryptionResult);
             }  
             #endregion
-
+            
             #region DecryptString()
             /// <summary>
             /// Performs the string decryption.
@@ -280,18 +326,18 @@ namespace Crypto
             {
                 // get string to decrypt
                 string stringToDecrypt = this.StringToDecryptControl.Text.ToString();
-
+                
                 // get password
                 string password = this.DecryptedPasswordControl.Text.ToString();
-
+                
                 // decrypt string
                 string decryptedString = CryptographyHelper.DecryptString(stringToDecrypt, password);
-
+                
                 // Display Decrypted Result Text
                 this.DecryptedStringControl.Text = decryptedString;
             }
             #endregion
-
+            
             #region EncryptionCopy()
             /// <summary>
             /// Copies the text of the encryption result to the clipboard.
@@ -305,7 +351,7 @@ namespace Crypto
                 Clipboard.SetText(encryptionResult);
             }  
             #endregion
-
+            
             #region EncryptString()
             /// <summary>
             /// Performs the string encryption.
@@ -314,18 +360,18 @@ namespace Crypto
             {
                 // get string to encrypt
                 string stringToEncrypt = this.StringToEncryptControl.Text.ToString();
-
+                
                 // get password
                 string password = this.EncryptionPasswordControl.Text.ToString();
-
+                
                 // encrypt string
                 string encryptedString = CryptographyHelper.EncryptString(stringToEncrypt, password);
-
+                
                 // Display Encrypted Result Text
                 this.EncryptedStringControl.Text = encryptedString;
             }  
             #endregion
-
+            
             #region Init()
             /// <summary>
             /// This method performs initializations for this object.
@@ -333,8 +379,12 @@ namespace Crypto
             private void Init()
             {
                 // Set the passwords
-                this.EncryptionPasswordControl.Text = "pokerpro";
-                this.DecryptedPasswordControl.Text = "pokerpro";
+                this.EncryptionPasswordControl.Text = CryptographyHelper.DefaultPassword;
+                this.DecryptedPasswordControl.Text = CryptographyHelper.DefaultPassword;
+                this.KeyCodeControl.Text = CryptographyHelper.DefaultPassword;
+
+                // test only
+                PasswordControl.Text = "ForMyEyesOnly";
             } 
             #endregion
             
@@ -380,13 +430,13 @@ namespace Crypto
                 
                 // if string to encrypt and encryption password have a value, the encrypt button will be enabled.
                 encryptionEncrypt = ((!String.IsNullOrEmpty(encryptionString)) && (!String.IsNullOrEmpty(encryptionPassword)));
-
+                
                 // if any of the decryption controls have a value in it, decryption clear will be deabled.
                 decryptionClear = ((!String.IsNullOrEmpty(decryptionString)) || (!String.IsNullOrEmpty(decryptionPassword)) || (!String.IsNullOrEmpty(decryptionResult)));
-
+                
                 // if the decryption result is presdet, decryptionCopy will be deabled.
                 decryptionCopy = (!String.IsNullOrEmpty(decryptionResult));
-
+                
                 // if string to decrypt and decryption password have a value, the decrypt button will be deabled.
                 decryptionDecrypt = ((!String.IsNullOrEmpty(decryptionString)) && (!String.IsNullOrEmpty(decryptionPassword)));
                 
@@ -401,10 +451,10 @@ namespace Crypto
                 this.DecryptButton.Enabled = decryptionDecrypt;
             }
             #endregion
-
+            
         #endregion
-               
+        
     }
     #endregion
-    
+
 }
