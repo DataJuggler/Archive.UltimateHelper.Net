@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataJuggler.Core.UltimateHelper", "DataJuggler.Core.UltimateHelper.csproj", "{B570D96E-C163-480D-8C89-192AC7CEF60A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataJuggler.Core.UltimateHelper.Test.Cryptography", "..\DataJuggler.Core.UltimateHelper.Test.Cryptography\DataJuggler.Core.UltimateHelper.Test.Cryptography.csproj", "{EFFED536-707A-4AD5-A648-5E63CFC6D2EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{B570D96E-C163-480D-8C89-192AC7CEF60A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B570D96E-C163-480D-8C89-192AC7CEF60A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B570D96E-C163-480D-8C89-192AC7CEF60A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFFED536-707A-4AD5-A648-5E63CFC6D2EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFFED536-707A-4AD5-A648-5E63CFC6D2EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFFED536-707A-4AD5-A648-5E63CFC6D2EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFFED536-707A-4AD5-A648-5E63CFC6D2EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
