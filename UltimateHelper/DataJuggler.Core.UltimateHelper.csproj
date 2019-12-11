@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BooleanHelper.cs" />
+    <Compile Include="ConfigurationHelper.cs" />
     <Compile Include="CryptographyHelper.cs" />
     <Compile Include="DateHelper.cs" />
     <Compile Include="DebugHelper.cs" />

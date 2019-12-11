@@ -8,8 +8,8 @@
     <ProjectGuid>{216DFB35-F840-41BC-8129-E0BDC60A0CF6}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RADStudioCryptographyManager</RootNamespace>
-    <AssemblyName>RADStudioCryptographyManager</AssemblyName>
+    <RootNamespace>Crypto</RootNamespace>
+    <AssemblyName>Crypto</AssemblyName>
     <ApplicationIcon>Lock32.ico</ApplicationIcon>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -41,6 +41,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DataJuggler.Core.UltimateHelper, Version=1.4.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\DataJuggler.Core.UltimateHelper.1.4.5\lib\net461\DataJuggler.Core.UltimateHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="DataJuggler.Win.Controls, Version=5.6.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\DataJuggler.Win.Controls.5.6.9\lib\net461\DataJuggler.Win.Controls.dll</HintPath>
+    </Reference>
     <Reference Include="Konscious.Security.Cryptography.Argon2, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Konscious.Security.Cryptography.Argon2.1.2.1\lib\net46\Konscious.Security.Cryptography.Argon2.dll</HintPath>
     </Reference>
@@ -95,17 +101,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Data Juggler.ico" />
+    <Content Include="lib\DataJuggler.Win.Controls Read Me.txt" />
     <Content Include="Lock32.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\DataJuggler.Win.Controls\DataJuggler.Win.Controls\DataJuggler.Win.Controls.csproj">
-      <Project>{70e97b98-9be2-4747-a3af-1c274ae401ce}</Project>
-      <Name>DataJuggler.Win.Controls</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\UltimateHelper\DataJuggler.Core.UltimateHelper.csproj">
-      <Project>{b570d96e-c163-480d-8c89-192ac7cef60a}</Project>
-      <Name>DataJuggler.Core.UltimateHelper</Name>
-    </ProjectReference>
+    <Content Include="Tools.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

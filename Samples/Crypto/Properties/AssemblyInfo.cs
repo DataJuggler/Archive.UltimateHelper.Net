@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("N/A")]
 [assembly: AssemblyProduct("Crypto")]
-[assembly: AssemblyCopyright("Copyright © N/A 2007")]
+[assembly: AssemblyCopyright("Copyright © 2019 - Free to Use - Do What You Want")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
