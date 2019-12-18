@@ -94,7 +94,7 @@ namespace DataJuggler.Core.UltimateHelper.Ex
             /// This method returns true if the text passed in contains
             /// & < > or %.
             /// </summary>
-            public bool NeedsEncoding(string text)
+            public static bool NeedsEncoding(string text)
             {
                 // initial value
                 bool needsEncoding = false;
