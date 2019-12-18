@@ -89,6 +89,28 @@ namespace DataJuggler.Core.UltimateHelper.Ex
             }
             #endregion
 
+            #region NeedsEncoding(string text)
+            /// <summary>
+            /// This method returns true if the text passed in contains
+            /// & < > or %.
+            /// </summary>
+            public bool NeedsEncoding(string text)
+            {
+                // initial value
+                bool needsEncoding = false;
+
+                // If the text string exists
+                if (TextHelper.Exists(text))
+                {
+                    // set to true if the text contains of the symbols that need encoding.
+                    needsEncoding = text.Contains(AmpersandSymbol) || text.Contains(GreaterThanSymbol) || text.Contains(LessThanSymbol) || text.Contains(PercentSymbol);
+                }
+                
+                // return value
+                return needsEncoding;
+            }
+            #endregion
+
         #endregion  
 
     }
