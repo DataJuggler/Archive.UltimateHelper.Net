@@ -11,7 +11,7 @@
     <iconUrl>https://github.com/DataJuggler/SharedRepo/blob/master/Shared/Images/DataJuggler.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>I added a new method to ListHelper called HasXOrMoreItems. This extends upon HasOneOrMoreItems to verify at least as many items exist as the given value of x.</releaseNotes>
+    <releaseNotes>Version 1.4.9. I put try catches to all the methods. If you get back a string, it works.</releaseNotes>
     <copyright>Copyright 2019 Data Juggler Software Licensed For Free To Do Whatever You Want. No Lawyers Needed Ever.</copyright>
     <tags>C# Helper Classes Data Juggler DataJuggler NullHelper TextHelper EnumHelper ListHelper List Helper Dialog Helper MessageBoxHelper Message Box Helper</tags>
   </metadata>
