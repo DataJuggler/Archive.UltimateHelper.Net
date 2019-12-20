@@ -207,7 +207,7 @@ namespace DataJuggler.Core.UltimateHelper
             }
             #endregion
 
-            #region GeneratePasswordHash(string password, string keyCode)
+            #region GeneratePasswordHash(string password, string keyCode, int verifyRetries = 0)
             /// <summary>
             /// This method hashes the password using Konscious.Security.Cryptography's implementation of Argon2.
             /// The salt is returned with the password separated by 4 | (pipe characters I think is the name).
