@@ -196,12 +196,14 @@ namespace DataJuggler.Core.UltimateHelper
             /// This method uses the default password, which is NotASecret.
             /// </summary>
             /// <param name="password">The password to create a hash for</param>
-            /// </param>
+            /// <param name="verifyRetries">If verify retries is above 0, this method will attempt to verify
+            /// the generated password hash with the same credentials. If it can't be verified, it will retry
+            /// up until this value for retries count. The value must be between 0 and 3. After 3 it fails.</param>
             /// <returns></returns>
-            public static string GeneratePasswordHash(string password)
+            public static string GeneratePasswordHash(string password, int verifyRetries = 0)
             {
-                // return value
-                return GeneratePasswordHash(password, DefaultPassword);
+                // call the override
+                return GeneratePasswordHash(password, DefaultPassword, verifyRetries);
             }
             #endregion
 
@@ -217,20 +219,79 @@ namespace DataJuggler.Core.UltimateHelper
             /// after it is created. You can decrypt from the encrypted password hash to determine the passwordhash and salt, but you cannot decrypt from 
             /// password hash back to the password.
             /// </param>
+            /// <param name="verifyRetries">If verify retries is above 0, this method will attempt to verify
+            /// the generated password hash with the same credentials. If it can't be verified, it will retry
+            /// up until this value for retries count. The value must be between 0 and 3. After 3 it fails.</param>
             /// <returns></returns>
-            public static string GeneratePasswordHash(string password, string keyCode)
+            public static string GeneratePasswordHash(string password, string keyCode, int verifyRetries = 0)
             {
                 // get the passwordHash
                 string passwordHash = null;
 
-                // the salt is either created or used
-                byte[] salt;
+                // local
+                bool verified = false;
                 
                 // if the password exists
                 if (TextHelper.Exists(password, keyCode))
-                {  
-                    // create the salt
-                    salt = CreateSalt();
+                {
+                    // get the passwordHash
+                    passwordHash = HashPart1(password, keyCode);
+
+                    // it will only try up to 3 times, then it bails
+                    if ((verifyRetries > 0) && (verifyRetries <= 3))
+                    {
+                        // try up to 3 times if verifyRetries is set to 3
+                        for (int x = 0; x < verifyRetries; x++)
+                        {
+                            // if all 3 strings exist
+                            if (TextHelper.Exists(password, password, keyCode))
+                            {
+                                // does 
+                                verified = VerifyHash(password, keyCode, passwordHash);
+                            }
+
+                            // if the value for verified is true
+                            if (verified)
+                            {
+                                // break out of the loop
+                                break;
+                            }
+
+                            // get the passwordHash (again)
+                            passwordHash = HashPart1(password, keyCode);
+                        }
+
+                        // if not veriified
+                        if (!verified)
+                        {
+                            // password hash could not be created
+                            passwordHash = "";
+                        }
+                    }
+                }
+
+                // return value
+                return passwordHash;
+            }
+            #endregion
+
+            #region HashPart1(string password, string keyCode)
+            /// <summary>
+            /// This method is used to call some portions of the GeneratePasswordHash
+            /// multiple times.
+            /// </summary>
+            /// <param name="part1"></param>
+            /// <param name="keyCode"></param>
+            /// <returns></returns>
+            private static string HashPart1(string password, string keyCode)
+            {
+                // initial value
+                string part1 = "";
+
+                try
+                {
+                     // Update 1.0.9 create the salt every time as the salt might be the problem (?)
+                     byte[] salt = CreateSalt();
 
                     // get the byte array
                     byte[] passwordBits = HashPassword(password, salt);
@@ -242,11 +303,19 @@ namespace DataJuggler.Core.UltimateHelper
                     string partI = hashInfo.ToString();
 
                     // set the return value
-                    passwordHash = EncryptString(partI, keyCode);
+                    part1 = EncryptString(partI, keyCode);
+                }
+                catch (Exception error)
+                {
+                    // for debugging only for now, I may return a response one day
+                    DebugHelper.WriteDebugError("HashPart1", "CryptographyHelper", error);
+
+                    // explicit set to null
+                    part1 = "";
                 }
 
                 // return value
-                return passwordHash;
+                return part1;
             }
             #endregion
 
@@ -271,7 +340,7 @@ namespace DataJuggler.Core.UltimateHelper
 
                     argon2.Salt = salt;
                     argon2.DegreeOfParallelism = 8; // four cores
-                    argon2.Iterations = 4;
+                    argon2.Iterations = 2;
                     argon2.MemorySize = 1024 * 1024; // 1 GB
 
                     // get the hash
