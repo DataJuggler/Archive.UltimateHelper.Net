@@ -22,14 +22,14 @@ namespace DataJuggler.Core.UltimateHelper
         
         #region Methods
 
-            #region ReadAppSetting(string settingName, bool dataIsEncrypted = false, string encryptionKey = "")
+            #region ReadAppSetting(string settingName)
             /// <summary>
             /// This method reads and decrypts the values
             /// in the App.config or Web.config appSettings section.
             /// </summary>
             /// <param name="settingName"></param>
             /// <returns></returns>
-            public static string ReadAppSetting(string settingName, bool dataIsEncrypted = false, string encryptionKey = "")
+            public static string ReadAppSetting(string settingName)
             {
                 // initial value
                 string settingValue = null;
@@ -48,27 +48,9 @@ namespace DataJuggler.Core.UltimateHelper
 
                     // if the temp string exists
                     if (TextHelper.Exists(temp))
-                    {
-                        // if the data is encrypted
-                        if (dataIsEncrypted)
-                        {
-                            // we must decrypt the data
-                            if (TextHelper.Exists(encryptionKey))
-                            {
-                                // use the default encryption key
-                                settingValue = CryptographyHelper.DecryptString(temp, encryptionKey);
-                            }
-                            else
-                            {
-                                // use the default encryption key
-                                settingValue = CryptographyHelper.DecryptString(temp);
-                            }
-                        }
-                        else
-                        {
-                            // return the setting value as is
-                            settingValue = temp;
-                        }
+                    { 
+                        // return the setting value as is
+                        settingValue = temp;
                     }
                 }
                 catch (Exception error)
