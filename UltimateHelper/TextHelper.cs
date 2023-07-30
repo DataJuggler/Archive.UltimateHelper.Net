@@ -386,6 +386,73 @@ namespace DataJuggler.Core.UltimateHelper
 
             #endregion
 
+            #region ExportTextLines(List<TextLine> lines, string mustContain, string mustNotContain)
+            /// <summary>
+            /// This method returns the Text Lines, with Environment.NewLine appended after each line.
+            /// </summary>
+            /// <param name="lines">A collection of TextLines to rebuild into a file or block'</param>
+            /// <param name="mustContainText">If present, a line must have this to be added.</param>
+            /// <param name="mustNotContainText">If present, a line with will not be added</param>
+            public static string ExportTextLines(List<TextLine> lines, string mustContainText = "", string mustNotContainText = "")
+            {
+                // initial value
+                string result = "";
+
+                // locals
+                bool mustContain = TextHelper.Exists(mustContainText);
+                bool mustNotContain = TextHelper.Exists(mustNotContainText);
+                bool addLine = false;
+
+                // If the lines collection exists and has one or more items
+                if (ListHelper.HasOneOrMoreItems(lines))
+                {
+                    // Create a new instance of a 'StringBuilder' object.
+                    StringBuilder sb = new StringBuilder();
+
+                    // Iterate the collection of TextLine objects
+                    foreach (TextLine line in lines)
+                    {
+                        // reset, default to true
+                        addLine = true;
+
+                        // if the value for mustContain is true
+                        if (mustContain)
+                        {
+                            // add line is true if this string contains the mustContainText
+                            addLine = line.Text.Contains(mustContainText);
+                        }
+
+                        // if addLine is true,a nd the mustNotContain is true
+                        if (addLine && mustNotContain)
+                        {
+                            // if the line contains the mustNotContainText                            
+                            if (line.Text.Contains(mustNotContainText))
+                            {
+                                // do not add this line
+                                addLine = false;
+                            }
+                        }
+
+                        // if addLine is true
+                        if (addLine)
+                        {
+                            // Add this line
+                            sb.Append(line.Text);
+
+                            // Add a NewLine char
+                            sb.Append(Environment.NewLine);
+                        }
+                    }
+
+                    // Set the result
+                    result = sb.ToString();
+                }
+                
+                // return value
+                return result;
+            }
+            #endregion
+            
             #region GetSpacesCount(string text)
             /// <summary>
             /// This method returns the number of preceding spaces in the text given.
@@ -434,39 +501,54 @@ namespace DataJuggler.Core.UltimateHelper
             /// <param name="sourceText"></param>
             /// <returns></returns>
             public static List<TextLine> GetTextLines(string sourceText)
-            {
+            {  
                 // initial value
                 List<TextLine> textLines = new List<TextLine>();
 
-                // typical delimiter characters
-                char[] delimiterChars = Environment.NewLine.ToCharArray();
-
-                // local
-                int counter = -1;
-
-                // verify the sourceText exists
-                if (!String.IsNullOrEmpty(sourceText))
+                // If the value for the property Exists.sourceText is true
+                if (Exists(sourceText))
                 {
-                    // Get the list of strings
-                    string[] linesOfText = sourceText.Split(delimiterChars);
-
-                    // now iterate the strings
-                    foreach (string lineOfText in linesOfText)
+                    // if the NewLine is not found
+                    if (!sourceText.Contains(Environment.NewLine))
                     {
-                        // local
-                        string text = lineOfText;
+                        // The parsing on lines isn't working, this is a good hack till
+                        // I rewrite the parser to be more robust someday
+                        sourceText = sourceText.Replace("\n", Environment.NewLine);
+                    }
 
-                        // increment the counter
-                        counter++;
+                    // just in case, fix for the hack
+                    sourceText = sourceText.Replace("\r\r", "\r");
 
-                        // add every other row
-                        if ((counter % 2) == 0)
+                    // typical delimiter characters
+                    char[] delimiterChars = Environment.NewLine.ToCharArray();
+
+                    // local
+                    int counter = -1;
+
+                    // verify the sourceText exists
+                    if (!String.IsNullOrEmpty(sourceText))
+                    {
+                        // Get the list of strings
+                        string[] linesOfText = sourceText.Split(delimiterChars);
+
+                        // now iterate the strings
+                        foreach (string lineOfText in linesOfText)
                         {
-                            // Create a new TextLine
-                            TextLine textLine = new TextLine(text);
+                            // local
+                            string text = lineOfText;
 
-                            // now add this textLine to textLines collection
-                            textLines.Add(textLine);
+                            // increment the counter
+                            counter++;
+
+                            // add every other row
+                            if ((counter % 2) == 0)
+                            {
+                                // Create a new TextLine
+                                TextLine textLine = new TextLine(text);
+
+                                // now add this textLine to textLines collection
+                                textLines.Add(textLine);
+                            }
                         }
                     }
                 }
@@ -514,6 +596,51 @@ namespace DataJuggler.Core.UltimateHelper
 
                             // now add this word to words collection
                             words.Add(word);
+                        }
+                    }
+                }
+
+                // return value
+                return words;
+            }
+            #endregion
+
+            #region GetWordsAsStrings(string sourceText, char[] delimiters = null)
+            /// <summary>
+            /// This method returns all of the string in a the sourceText.
+            /// This is a modified version of GetWords that returns a list of strings.
+            /// </summary>
+            /// <param name="sourceText"></param>
+            /// <returns></returns>
+            public static List<string> GetWordsAsStrings(string sourceText, char[] delimiters = null)
+            {
+                // initial value
+                List<string> words = new List<string>();
+
+                // typical delimiter characters
+                char[] delimiterChars = { ' ', '-', '/', ',', '.', ':', '\t' };
+
+                // if the delimiters exists
+                if (delimiters != null)
+                {
+                    // use the delimiters passedin
+                    delimiterChars = delimiters;
+                }
+
+                // verify the sourceText exists
+                if (!String.IsNullOrEmpty(sourceText))
+                {
+                    // Get the list of strings
+                    string[] strings = sourceText.Split(delimiterChars);
+
+                    // now iterate the strings
+                    foreach (string stringWord in strings)
+                    {
+                        // verify the word is not an empty string or a space
+                        if (!String.IsNullOrEmpty(stringWord))
+                        {
+                            // now add this word to words collection
+                            words.Add(stringWord);
                         }
                     }
                 }

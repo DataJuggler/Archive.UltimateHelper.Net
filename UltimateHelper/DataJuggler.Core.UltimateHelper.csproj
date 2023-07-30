@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DataJuggler.Core.UltimateHelper</RootNamespace>
     <AssemblyName>DataJuggler.Core.UltimateHelper</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -85,7 +85,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="TextHelper.cs" />
-    <Compile Include="WordParser.cs" />
     <Compile Include="XmlPatternHelper.cs" />
   </ItemGroup>
   <ItemGroup>
