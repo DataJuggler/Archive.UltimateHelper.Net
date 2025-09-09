@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>$version$</version>
+    <version>1.9.0</version>
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
+		Version 1.9.0 - EnvironmentVariableHelper was updated to have a parameter for User or Machine 
 		Version 1.7.0 - WordParser has been eliminated. Use TextHelper for all methods that WordParser useds to implement.
 		Version 1.6.0 - This project was updated to 4.8 .NET Framework
 		Version 1.5.0 - I am in the process of moving CryptographyHelper to its own package for the .Net Framework. I didn't like all the baggage the Konscious.Security and Argon libraries
