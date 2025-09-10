@@ -62,6 +62,31 @@ namespace DataJuggler.Core.UltimateHelper
         }
         #endregion
             
+        #region Exists(string filePath)
+        /// <summary>
+        /// method returns the
+        /// </summary>
+        public static bool Exists(string filePath)
+        {
+            // initial value
+            bool exists = false;
+
+            // if the string exists
+            if (TextHelper.Exists(filePath))
+            {
+                // if the fileExists
+                if (System.IO.File.Exists(filePath))
+                {
+                    // set to true
+                    exists = true;
+                }
+            }
+
+            // return value
+            return exists;
+        }
+        #endregion
+
         #region GetFileNameWithoutExtensionEx(string fullName, ref string extension)
         /// <summary>
         /// This method returns the File Name Without Extension
