@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>1.9.12</version>
+    <version>1.10.0</version>
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
@@ -12,6 +12,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
+    Version 1.10.0 - DateHelper was synced with .NET 10 version of the same file.
+    Version 1.9.14 - Switched out System.Data.SqlClient with Microsoft.Data.SqlClient
 		Version 1.9.8 - Added a default value for digits to 0 for RoundUp and RoundDown.
 		Version 1.9.5 - Copied some code from the .NET 10 version for RoundDown and RoundUp with a digits override. 
 		Version 1.9.4 - Copied some code from the .NET 10 version to make a special version of Excelerate.
